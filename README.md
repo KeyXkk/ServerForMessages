@@ -7,9 +7,6 @@ server.py commands
   To exit write 'exit' or 'esc'\n
                                     Version 0.2
 
-
-
-
 newclient.py commands
 
   help - list of all commands
