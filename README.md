@@ -1,10 +1,10 @@
 server.py commands
 
   Start - starting server on localhost, port 5555
-  Change - you can change your host and port
-  Send - send message to client
-  Checkconn - checking connection with client\n
-  To exit write 'exit' or 'esc'\n
+    Change - you can change your host and port
+    Send - send message to client
+    Checkconn - checking connection with client\n
+    To exit write 'exit' or 'esc'\n
                                     Version 0.2
 
 newclient.py commands
