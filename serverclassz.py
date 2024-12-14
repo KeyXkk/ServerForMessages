@@ -3,6 +3,8 @@ import threading
 import os
 from datetime import datetime
 
+clients = {}
+
 class Server:
     def __init__(self, host, port, max_clients):
         self.maxclients = max_clients
@@ -10,6 +12,7 @@ class Server:
         self.port = port
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.isserverstart = False
+        self.username = ''
     
     def start_server(self):
         self.server.bind((self.host, self.port))
@@ -26,29 +29,41 @@ class Server:
     def handle_client(self):
         while True:
             client_socket, addr = self.server.accept()
-            print(f"Client joined: {addr}")
+            self.username = client_socket.recv(1024).decode('utf-8')
+            
+            if self.username.startswith('@') and self.username not in clients:
+                clients[self.username] = client_socket  # Сохраняем сокет клиента
+                print(f"Client {self.username} joined from {addr}")
+                messages_handler = threading.Thread(target=self.handle_messages, args=(client_socket, self.username))
+                messages_handler.start()
+            else:
+                print(f"Username {self.username} is already taken or invalid.")
+                client_socket.close()  # Закрываем сокет, если никнейм занят
+         
+    def handle_messages(self, client_socket, username):
+        while True:
             try:
                 message = client_socket.recv(1024).decode('utf-8')
                 if message:
-                    print(f"Message from client: {message}")
-                else:
-                    break
-            except:
+                    print(f"Message from {username}: {message}")
+            except ConnectionResetError:
+                print(f"Client {username} has disconnected.")
+                del clients[username]  # Удаляем клиента из словаря
                 break
-        client_socket.close()
         
     def send_message(self):
         if self.isserverstart:
-            if self.is_connected():    
-                try:
-                    message = input("Write your message:\n")
-                    self.server.send(message.encode('utf-8'))
-                except:
-                    print("Connection with client absent :(")
-            else:
-                print("Connection with client absent :(")
+            try:
+                message = input('Write your message: ')
+                print(self.username)
+                if self.username in clients:
+                    clients[self.username].send(message.encode('utf-8'))
+                else:
+                    print("Username not found in clients.")
+            except Exception as e:
+                print(f"Failed to send message: {e}")
         else:
-            print("You need to start server")
+            print("You need to start the server")
 
     def is_connected(self):
             try:
@@ -60,7 +75,7 @@ class Server:
             
 
 def handle_console():
-    MyServer = Server(host='localhost', port=5555, max_clients=25)    
+    MyServer = Server(host='127.0.0.1', port=5555, max_clients=25)    
     while True:
         command = input()
 
