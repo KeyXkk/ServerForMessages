@@ -94,7 +94,7 @@ def handle_console():
                   Send - send message to client
                   Checkconn - checking connection with client\n
                   To exit write 'exit' or 'esc'\n
-                  Version 0.1""")
+                  Version 0.2""")
             continue
         elif command.lower() == 'change':
             oneortwo = input('What do you want to change? 1 - host, 2 - port')
